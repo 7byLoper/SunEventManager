@@ -1,4 +1,4 @@
-package ru.loper.suneventmanager.api.modules.loot.chest;
+package ru.loper.suneventmanager.api.modules.chest;
 
 import lombok.Getter;
 import org.bukkit.Location;
@@ -9,8 +9,8 @@ import org.bukkit.util.Vector;
 import ru.loper.suncore.utils.Colorize;
 import ru.loper.suneventmanager.api.modules.event.Event;
 import ru.loper.suneventmanager.api.modules.event.rarity.EventRarity;
-import ru.loper.suneventmanager.api.modules.loot.Loot;
 import ru.loper.suneventmanager.utils.LocationUtils;
+import ru.loper.sunlootmanager.api.modules.Loot;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,13 +18,11 @@ import java.util.concurrent.ThreadLocalRandom;
 @Getter
 public class ChestsManager {
     protected final EventRarity eventRarity;
-
+    protected final Map<Event, Set<Chest>> eventChests;
+    protected final Set<Vector> chestOffsets;
     protected String chestTitle;
     protected Material chestMaterial;
     protected int chestSize, minItems, maxItems;
-
-    protected final Map<Event, Set<Chest>> eventChests;
-    protected final Set<Vector> chestOffsets;
 
     public ChestsManager(EventRarity eventRarity) {
         this.eventRarity = eventRarity;

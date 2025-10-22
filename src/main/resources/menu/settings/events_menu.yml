@@ -1,0 +1,24 @@
+title: 'Список ивентов'
+rows: 4
+events-slots: [ 0,1,2,3,4,5,6,7,8,
+                9,10,11,12,13,14,15,16,17,
+                18,19,20,21,22,23,24,25,26 ]
+decor:
+  BLACK_STAINED_GLASS_PANE: [ 27,28,29,30,31,32,33,34,35 ]
+
+
+event_form:
+  material: GRAY_SHULKER_BOX
+  display_name: '&7Ивент: &f{event}'
+  lore:
+    - '&8▪ Запущено: &f{runs}'
+    - ''
+    - '&e▶ ЛКМ: &7Редактировать'
+
+items:
+  next_page:
+    material: arrow
+    slot: 32
+  back_page:
+    material: arrow
+    slot: 30

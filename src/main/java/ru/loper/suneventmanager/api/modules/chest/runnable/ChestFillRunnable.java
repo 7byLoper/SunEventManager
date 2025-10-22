@@ -1,9 +1,9 @@
-package ru.loper.suneventmanager.api.modules.loot.chest.runnable;
+package ru.loper.suneventmanager.api.modules.chest.runnable;
 
 import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import ru.loper.suneventmanager.api.modules.loot.chest.Chest;
+import ru.loper.suneventmanager.api.modules.chest.Chest;
 
 import java.util.List;
 

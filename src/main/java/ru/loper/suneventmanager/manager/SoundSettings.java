@@ -1,4 +1,4 @@
-package ru.loper.suneventmanager.utils;
+package ru.loper.suneventmanager.manager;
 
 import lombok.Getter;
 import org.bukkit.Sound;

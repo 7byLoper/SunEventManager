@@ -15,7 +15,5 @@ public class EventsRunnable extends BukkitRunnable {
             if (!activeEvent.isActivate()) continue;
             activeEvent.eventTimerProgress();
         }
-
-
     }
 }

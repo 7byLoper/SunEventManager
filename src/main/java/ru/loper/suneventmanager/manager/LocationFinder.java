@@ -1,7 +1,8 @@
-package ru.loper.suneventmanager.utils;
+package ru.loper.suneventmanager.manager;
 
 import io.papermc.lib.PaperLib;
 import lombok.SneakyThrows;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import ru.loper.suneventmanager.SunEventManager;
@@ -23,24 +24,32 @@ public final class LocationFinder {
         EventConfigManager configManager = event.getConfigManager();
         int generateRadius = configManager.getGeneratorRadius();
         World world = configManager.getEventWorld();
+        double worldRadius = world.getWorldBorder().getSize() / 2;
+
+        if (generateRadius > worldRadius) {
+            generateRadius = (int) worldRadius;
+        }
 
         int x = getRandom(-generateRadius, generateRadius);
         int z = getRandom(-generateRadius, generateRadius);
 
         if (SunEventManager.isDebug()) {
-            System.out.println("GET: X:" + x + " Z: " + z);
+            Bukkit.getLogger().info("GET: X:" + x + " Z: " + z);
         }
 
         PaperLib.getChunkAtAsync(world, x, z, true).thenAcceptAsync(chunk -> {
             Location location = new Location(world, x, world.getHighestBlockYAt(x, z) + 1, z);
 
             if (configManager.isAllowedBiome(location.getBlock().getBiome())) {
-                System.out.println("Successfully find location! " + location);
+                if (SunEventManager.isDebug()) {
+                    Bukkit.getLogger().info("Successfully find location! " + location);
+                }
                 event.setEventLocation(location);
+                return;
             }
 
             if (SunEventManager.isDebug()) {
-                System.out.println("Location find! Not allowed biome " + location);
+                Bukkit.getLogger().info("Location find! Not allowed biome " + location);
             }
 
             findLocation();

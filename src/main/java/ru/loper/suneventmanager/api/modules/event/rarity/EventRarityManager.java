@@ -1,10 +1,10 @@
-package ru.loper.suneventmanager.api.modules.event.rare;
+package ru.loper.suneventmanager.api.modules.event.rarity;
 
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import ru.loper.suncore.api.config.CustomConfig;
-import ru.loper.suneventmanager.SunEventManager;
+import ru.loper.sunlootmanager.SunLootManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,8 +14,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 public class EventRarityManager {
-    private final Map<String, EventRarity> rarities = new HashMap<>();
-    private final CustomConfig config;
+    protected final Map<String, EventRarity> rarities = new HashMap<>();
+    protected final CustomConfig config;
     private final Plugin plugin;
 
     public EventRarityManager(CustomConfig config, Plugin plugin) {
@@ -24,7 +24,7 @@ public class EventRarityManager {
         loadRarities();
     }
 
-    private void loadRarities() {
+    protected void loadRarities() {
         ConfigurationSection raresSection = config.getConfig().getConfigurationSection("rarities");
         if (raresSection == null) {
             plugin.getLogger().severe("Раздел 'rarities' не найден в конфиге!");
@@ -34,7 +34,7 @@ public class EventRarityManager {
         for (String rarityKey : raresSection.getKeys(false)) {
             ConfigurationSection raritySection = raresSection.getConfigurationSection(rarityKey);
             if (raritySection != null) {
-                rarities.put(rarityKey.toLowerCase(), new EventRarity(raritySection, SunEventManager.getInstance().getLootManager(),config));
+                rarities.put(rarityKey.toLowerCase(), new EventRarity(raritySection, SunLootManager.getInstance().getLootManager(), config));
             }
         }
     }

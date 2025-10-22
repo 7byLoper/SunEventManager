@@ -3,10 +3,7 @@ package ru.loper.suneventmanager.hook;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.FlagContext;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -21,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class WorldGuardHook {
+public class RegionManager {
 
     public static boolean isRegionEmpty(Location location, Vector regionVector) {
         double x = regionVector.getX();
@@ -29,7 +26,7 @@ public class WorldGuardHook {
         double z = regionVector.getZ();
 
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
+        com.sk89q.worldguard.protection.managers.RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
 
         Location point1 = new Location(location.getWorld(), location.getX() + x, location.getY() + y, location.getZ() + z);
         Location point2 = new Location(location.getWorld(), location.getX() - x, location.getY() - y, location.getZ() - z);
@@ -55,21 +52,16 @@ public class WorldGuardHook {
             Location location = event.getEventLocation();
 
             RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
+            com.sk89q.worldguard.protection.managers.RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
 
             Location point1 = new Location(location.getWorld(), location.getX() + x, location.getY() + y, location.getZ() + z);
             Location point2 = new Location(location.getWorld(), location.getX() - x, location.getY() - y, location.getZ() - z);
 
-            ProtectedCuboidRegion region = new ProtectedCuboidRegion(event.getId() + "_region_" + event.getUuid(),
+            ProtectedCuboidRegion region = new ProtectedCuboidRegion("sunevent_" + event.getId() + "_region_" + event.getUuid(),
                     BlockVector3.at(point1.getX(), point1.getY(), point1.getZ()),
                     BlockVector3.at(point2.getX(), point2.getY(), point2.getZ()));
 
-            Map<Flag<?>, String> flags = event.getConfigManager().getFlags();
-
-            for (Map.Entry<Flag<?>, String> entry : flags.entrySet()) {
-                StateFlag stateFlag = (StateFlag) entry.getKey();
-                region.setFlag(stateFlag, stateFlag.parseInput(FlagContext.create().setInput((entry.getValue()).toUpperCase()).build()));
-            }
+            setFlags(event, region);
 
             assert regions != null;
             regions.addRegion(region);
@@ -78,10 +70,51 @@ public class WorldGuardHook {
         }
     }
 
+    private static void setFlags(Event event, ProtectedCuboidRegion region) throws InvalidFlagFormat {
+        Map<Flag<?>, String> flags = event.getEventRarity().getFlags();
+
+        for (Map.Entry<Flag<?>, String> entry : flags.entrySet()) {
+            Flag<?> flag = entry.getKey();
+            String value = entry.getValue();
+
+            setFlag(flag, region, value);
+        }
+    }
+
+    private static void setFlag(Flag<?> flag, ProtectedCuboidRegion region, String value) throws InvalidFlagFormat {
+        if (flag instanceof StateFlag stateFlag) {
+            region.setFlag(
+                    stateFlag,
+                    stateFlag.parseInput(FlagContext.create().setInput(value.toUpperCase()).build())
+            );
+        } else if (flag instanceof StringFlag stringFlag) {
+            region.setFlag(
+                    stringFlag,
+                    value
+            );
+        } else if (flag instanceof BooleanFlag booleanFlag) {
+            region.setFlag(
+                    booleanFlag,
+                    booleanFlag.parseInput(FlagContext.create().setInput(value).build())
+            );
+        } else if (flag instanceof DoubleFlag doubleFlag) {
+            region.setFlag(
+                    doubleFlag,
+                    doubleFlag.parseInput(FlagContext.create().setInput(value).build())
+
+            );
+        } else if (flag instanceof IntegerFlag intFlag) {
+            region.setFlag(
+                    intFlag,
+                    intFlag.parseInput(FlagContext.create().setInput(value).build())
+            );
+        }
+    }
+
     public static void remove(Event event) {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager regions = container.get(BukkitAdapter.adapt(event.getEventLocation().getWorld()));
+        com.sk89q.worldguard.protection.managers.RegionManager regions = container.get(BukkitAdapter.adapt(event.getEventLocation().getWorld()));
         assert regions != null;
-        regions.removeRegion(event.getId() + "_region_" + event.getUuid(), RemovalStrategy.REMOVE_CHILDREN);
+        regions.removeRegion("sunevent_" + event.getId() + "_region_" + event.getUuid(), RemovalStrategy.REMOVE_CHILDREN);
     }
 }

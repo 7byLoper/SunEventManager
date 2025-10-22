@@ -2,6 +2,6 @@ name: SunEventManager
 version: '${project.version}'
 main: ru.loper.suneventmanager.SunEventManager
 api-version: '1.16'
-depend: [SunCore, PlaceholderAPI]
-authors: [Loper]
+depend: [ SunCore, PlaceholderAPI, DecentHolograms ]
+authors: [ Loper ]
 website: t.me/bySunDev

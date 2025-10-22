@@ -1,4 +1,4 @@
-package ru.loper.suneventmanager.api.modules.event.rare;
+package ru.loper.suneventmanager.api.modules.event.rarity;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -15,11 +15,11 @@ import org.jetbrains.annotations.NotNull;
 import ru.loper.suncore.api.config.CustomConfig;
 import ru.loper.suncore.utils.Colorize;
 import ru.loper.suneventmanager.SunEventManager;
-import ru.loper.suneventmanager.api.modules.loot.Loot;
-import ru.loper.suneventmanager.api.modules.loot.LootManager;
-import ru.loper.suneventmanager.api.modules.loot.chest.ChestsManager;
+import ru.loper.suneventmanager.api.modules.chest.ChestsManager;
 import ru.loper.suneventmanager.manager.SoundSettings;
 import ru.loper.suneventmanager.utils.LocationUtils;
+import ru.loper.sunlootmanager.api.manager.LootManager;
+import ru.loper.sunlootmanager.api.modules.Loot;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,36 +33,40 @@ import java.util.stream.Collectors;
 
 @Getter
 public class EventRarity {
-    private final CustomConfig config;
-    private final ConfigurationSection rareSection;
-    private final ConfigurationSection chestsSection;
+    protected CustomConfig config;
+    protected ConfigurationSection rareSection;
+    protected ConfigurationSection chestsSection;
 
-    private final String name;
-    private final int chance;
+    protected String name;
+    protected String displayName;
+    protected int chance;
 
-    private final String schematicFileName;
-    private final Vector schemeOffset;
-    private final Vector hologramOffset;
+    protected String schematicFileName;
+    protected Vector schemeOffset;
+    protected Vector hologramOffset;
 
-    private final List<String> hologramStart;
-    private final List<String> hologramStop;
-    private final List<String> prestartMessages;
-    private final List<String> startMessages;
-    private final List<String> stopMessages;
+    protected List<String> hologramStart;
+    protected List<String> hologramStop;
+    protected List<String> prestartMessages;
+    protected List<String> startMessages;
+    protected List<String> stopMessages;
 
-    private final SoundSettings prestartSound;
-    private final SoundSettings startSound;
-    private final SoundSettings stopSound;
+    protected SoundSettings prestartSound;
+    protected SoundSettings startSound;
+    protected SoundSettings stopSound;
 
-    private final Map<Flag<?>, String> flags;
-    private Loot loot;
+    protected Map<Flag<?>, String> flags;
+    protected Loot loot;
 
-    private final ChestsManager chestsManager;
+    protected ChestsManager chestsManager;
+
+    protected boolean hologramSpawn;
 
     public EventRarity(ConfigurationSection rareSection, @NotNull LootManager lootManager, @NotNull CustomConfig config) {
         this.rareSection = rareSection;
         this.config = config;
         this.name = rareSection.getName();
+        this.displayName = Colorize.parse(rareSection.getString("display_name",""));
         this.chance = rareSection.getInt("chance", 100);
         this.schematicFileName = rareSection.getString("schematic_file_name");
         this.loot = lootManager.getLoot(rareSection.getString("loot_name", "")).orElse(null);
@@ -70,6 +74,7 @@ public class EventRarity {
         ConfigurationSection hologramsSection = rareSection.getConfigurationSection("holograms");
         this.hologramStart = hologramsSection != null ? hologramsSection.getStringList("start") : Collections.emptyList();
         this.hologramStop = hologramsSection != null ? hologramsSection.getStringList("stop") : Collections.emptyList();
+        this.hologramSpawn = rareSection.getBoolean("hologram_toggle", false);
 
         ConfigurationSection messagesSection = rareSection.getConfigurationSection("messages");
         this.prestartMessages = messagesSection != null ? Colorize.parse(messagesSection.getStringList("prestart")) : Collections.emptyList();

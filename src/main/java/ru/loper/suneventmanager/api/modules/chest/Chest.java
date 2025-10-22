@@ -1,4 +1,4 @@
-package ru.loper.suneventmanager.api.modules.loot.chest;
+package ru.loper.suneventmanager.api.modules.chest;
 
 import com.jeff_media.customblockdata.CustomBlockData;
 import lombok.Getter;
@@ -19,8 +19,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.loper.suneventmanager.SunEventManager;
+import ru.loper.suneventmanager.api.modules.chest.runnable.ChestFillRunnable;
 import ru.loper.suneventmanager.api.modules.event.Event;
-import ru.loper.suneventmanager.api.modules.loot.chest.runnable.ChestFillRunnable;
 import ru.loper.suneventmanager.hook.HologramsHook;
 import ru.loper.suneventmanager.utils.TimeUtils;
 
@@ -40,10 +40,9 @@ public class Chest implements InventoryHolder {
     protected final Event event;
     protected final String hologramName;
     protected final Inventory inventory;
-
+    protected final UUID chestUuid = UUID.randomUUID();
     protected boolean open;
     protected boolean filled;
-    protected final UUID chestUuid = UUID.randomUUID();
 
     public Chest(ChestsManager chestsManager, Location location, Event event) {
         this.chestsManager = Objects.requireNonNull(chestsManager, "ChestsManager cannot be null");
@@ -56,6 +55,20 @@ public class Chest implements InventoryHolder {
                 Component.text(chestsManager.getChestTitle()));
 
         CHESTS.put(getChestId(), this);
+    }
+
+    public static @Nullable Chest getChest(@NotNull Block block) {
+        CustomBlockData customBlockData = new CustomBlockData(block, SunEventManager.getInstance());
+        String chestId = customBlockData.get(CHEST_UUID_KEY, PersistentDataType.STRING);
+        return chestId != null ? CHESTS.get(chestId) : null;
+    }
+
+    public static Collection<Chest> getAllChests() {
+        return Collections.unmodifiableCollection(CHESTS.values());
+    }
+
+    public static void removeAllChests() {
+        new ArrayList<>(CHESTS.values()).forEach(Chest::remove);
     }
 
     @Override
@@ -165,19 +178,5 @@ public class Chest implements InventoryHolder {
     public void onInteract(@NotNull PlayerInteractEvent event) {
         onPlayerOpen(event.getPlayer());
         event.setCancelled(true);
-    }
-
-    public static @Nullable Chest getChest(@NotNull Block block) {
-        CustomBlockData customBlockData = new CustomBlockData(block, SunEventManager.getInstance());
-        String chestId = customBlockData.get(CHEST_UUID_KEY, PersistentDataType.STRING);
-        return chestId != null ? CHESTS.get(chestId) : null;
-    }
-
-    public static Collection<Chest> getAllChests() {
-        return Collections.unmodifiableCollection(CHESTS.values());
-    }
-
-    public static void removeAllChests() {
-        new ArrayList<>(CHESTS.values()).forEach(Chest::remove);
     }
 }

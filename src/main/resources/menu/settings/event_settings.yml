@@ -1,0 +1,32 @@
+title: 'Настройка {event}'
+rows: 4
+decor:
+  BLACK_STAINED_GLASS_PANE: [ 27,28,29,30,31,32,33,34,35 ]
+items:
+  rarities_settings:
+    material: BELL
+    display_name: '&e▶ Настройка редкостей'
+    lore:
+      - '&7ЛКМ чтобы настроить'
+    slot: 13
+
+  start_event:
+    material: EMERALD_BLOCK
+    display_name: '&a▶ Запустить ивент'
+    lore:
+      - '&7Запустить новый ивент вручную'
+    slot: 12
+
+  stop_all_events:
+    material: BARRIER
+    display_name: '&c■ Остановить все ивенты'
+    lore:
+      - '&7Принудительно остановить все активные ивенты'
+    slot: 14
+
+  back:
+    material: PLAYER_HEAD
+    display_name: '&c↩ Назад'
+    lore:
+      - '&7Вернуться к списку ивентов'
+    slot: 31

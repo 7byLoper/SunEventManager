@@ -1,0 +1,24 @@
+settings:
+  # Статус голосований (true/false)
+  # Включены или отключены
+  vote: true
+  # Время до старта голосования
+  vote_start_time: 1800
+  vote_time: 60
+  # Вес голоса для премиум игроков
+  premium_vote_weight: 2
+  premium_vote_permission: 'sunevents.premium'
+  vote_event_counts:
+    min: 2
+    max: 4
+
+  # Спавн ивентов независимо от голосований
+  # (true/false) Включены или отключены
+  events_spawn: true
+  # Время до старта ивента
+  events_time: 600
+
+debug: true
+commands:
+  event: event
+  vote: vote
