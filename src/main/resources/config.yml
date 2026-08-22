@@ -1,24 +1,50 @@
 settings:
-  # Статус голосований (true/false)
-  # Включены или отключены
+  # Автоматические голосования.
   vote: true
-  # Время до старта голосования
+  # Через сколько секунд запускать следующее голосование.
   vote_start_time: 1800
+  # Сколько секунд длится голосование.
   vote_time: 60
-  # Вес голоса для премиум игроков
+  # Вес голоса игрока с premium_vote_permission.
   premium_vote_weight: 2
   premium_vote_permission: 'sunevents.premium'
   vote_event_counts:
     min: 2
     max: 4
 
-  # Спавн ивентов независимо от голосований
-  # (true/false) Включены или отключены
+  # Автоматический запуск ивентов независимо от голосований.
   events_spawn: true
-  # Время до старта ивента
+  # Через сколько секунд запускать следующий случайный ивент.
   events_time: 600
 
+  # Обновлять открытое меню голосования при изменении голосов.
+  # Если в title есть {time}, меню также обновляется раз в секунду для таймера.
+  update_vote_menu: true
+
+  # Сколько блоков схематики обрабатывать за тик во время подготовки ивента.
+  # Чем меньше значение, тем ниже пиковая нагрузка, но дольше подготовка большой схематики.
+  schematic_scan_blocks_per_tick: 4096
+
 debug: true
-commands:
-  event: event
-  vote: vote
+
+command:
+  event:
+    enable: true
+    command: event
+
+    # NONE - /event ничего не отправляет.
+    # MESSAGE - /event отправляет event_help_message из messages.yml.
+    no_arguments: MESSAGE
+
+    delay:
+      enable: true
+
+  vote:
+    enable: true
+    command: vote
+
+    # Регистрировать отдельную команду /vote.
+    standalone: true
+
+    # Добавить голосование как /event vote, /event vote start, /event vote stop.
+    event_subcommand: true

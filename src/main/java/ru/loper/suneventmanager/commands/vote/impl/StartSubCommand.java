@@ -1,33 +1,45 @@
 package ru.loper.suneventmanager.commands.vote.impl;
 
-import lombok.RequiredArgsConstructor;
-import org.bukkit.command.CommandSender;
-import ru.loper.suncore.api.command.SubCommand;
-import ru.loper.suncore.utils.Colorize;
-import ru.loper.suneventmanager.api.modules.vote.VoteManager;
-import ru.loper.suneventmanager.config.PluginConfigManager;
-
 import java.util.Collections;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
+import ru.loper.suncore.api.command.BuildableCommand;
+import ru.loper.suncore.api.command.register.SubCommandRegister;
+import ru.loper.suneventmanager.config.PluginConfigManager;
+import ru.loper.suneventmanager.manager.VoteManager;
+import ru.loper.suneventmanager.message.ConfiguredMessages;
 
 @RequiredArgsConstructor
-public class StartSubCommand implements SubCommand {
+@SubCommandRegister(permission = "suneventmanager.command.vote.start", aliases = "start")
+public class StartSubCommand implements BuildableCommand {
     private final VoteManager voteManager;
     private final PluginConfigManager configManager;
 
     @Override
-    public void onCommand(CommandSender commandSender, String[] args) {
+    public void handle(@NotNull CommandSender commandSender, String[] args) {
         if (voteManager.isVoteInProgress()) {
-            commandSender.sendMessage(configManager.getVoteIsStartMessage());
+            ru.loper.suneventmanager.SunEventManager.getInstance()
+                    .getMessageService()
+                    .send(commandSender, configManager.getVoteIsStartMessage(), java.util.Collections.emptyMap());
             return;
         }
 
         voteManager.startVote();
-        commandSender.sendMessage(Colorize.parse("&b▶ &fВы успешно &6запустили&f голосование"));
+        if (voteManager.isVoteInProgress()) {
+            ConfiguredMessages.send(
+                    commandSender, "commands.vote.started", "&b▶ &fВы успешно &6запустили&f голосование");
+        } else {
+            ConfiguredMessages.send(
+                    commandSender,
+                    "commands.vote.start_failed",
+                    "&c▶ &fНе удалось запустить голосование: нет доступных ивентов.");
+        }
     }
 
     @Override
-    public List<String> onTabCompleter(CommandSender commandSender, String[] args) {
+    public List<String> tabComplete(@NotNull CommandSender commandSender, String[] args) {
         return Collections.emptyList();
     }
 }

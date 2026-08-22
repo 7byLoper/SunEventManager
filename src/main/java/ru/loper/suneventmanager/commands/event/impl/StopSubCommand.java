@@ -1,22 +1,27 @@
 package ru.loper.suneventmanager.commands.event.impl;
 
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.CommandSender;
-import ru.loper.suncore.api.command.SubCommand;
-import ru.loper.suncore.utils.Colorize;
-import ru.loper.suneventmanager.api.modules.event.Event;
-import ru.loper.suneventmanager.api.modules.event.EventManager;
-
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import ru.loper.suncore.api.command.BuildableCommand;
+import ru.loper.suncore.api.command.register.SubCommandRegister;
+import ru.loper.suneventmanager.api.models.Event;
+import ru.loper.suneventmanager.manager.EventManager;
+import ru.loper.suneventmanager.message.ConfiguredMessages;
 
 @RequiredArgsConstructor
-public class StopSubCommand implements SubCommand {
+@SubCommandRegister(permission = "suneventmanager.command.stop", aliases = "stop")
+public class StopSubCommand implements BuildableCommand {
     private final EventManager eventManager;
 
     @Override
-    public void onCommand(CommandSender sender, String[] args) {
+    public void handle(@NotNull CommandSender sender, String[] args) {
         if (args.length == 1) {
-            sender.sendMessage(Colorize.parse("&#FFF78F[EventManager] &fИспользование: &7/event stop <all | eventId | uuid>"));
+            ConfiguredMessages.send(
+                    sender,
+                    "commands.stop.usage",
+                    "&#FFF78F[EventManager] &fИспользование: &7/event stop \\<all | eventId | uuid>");
             return;
         }
 
@@ -37,7 +42,8 @@ public class StopSubCommand implements SubCommand {
 
         if (args.length >= 3) {
             try {
-                handleStopByEventIdAndUuid(sender, target, UUID.fromString(args[2]).toString());
+                handleStopByEventIdAndUuid(
+                        sender, target, UUID.fromString(args[2]).toString());
                 return;
             } catch (IllegalArgumentException ignored) {
 
@@ -50,36 +56,49 @@ public class StopSubCommand implements SubCommand {
     private void handleStopAll(CommandSender sender) {
         int count = eventManager.getActiveEvents().size();
         eventManager.stopAllActiveEvents();
-        sender.sendMessage(Colorize.parse(String.format(
-                "&#FFF78F[EventManager] &fОстановлены все активные ивенты &7(&#ffff00%d&7",
-                count
-        )));
+        ConfiguredMessages.send(
+                sender,
+                "commands.stop.all",
+                "&#FFF78F[EventManager] &fОстановлены все активные ивенты &7(&#ffff00{count}&7)",
+                "count",
+                count);
     }
 
     private void handleStopByUuid(CommandSender sender, String uuid) {
         Event event = eventManager.getEventByUUID(uuid);
         if (event == null) {
-            sender.sendMessage(Colorize.parse("&#FFF78F[EventManager] &fИвент с UUID &#FF0000" + uuid.substring(0, 8) + "...&f не найден"));
+            ConfiguredMessages.send(
+                    sender,
+                    "commands.stop.uuid_not_found",
+                    "&#FFF78F[EventManager] &fИвент с UUID &#FF0000{uuid}...&f не найден",
+                    "uuid",
+                    uuid.substring(0, 8));
             return;
         }
 
         event.updateStopping();
-        sender.sendMessage(Colorize.parse(String.format(
-                "&#FFF78F[EventManager] &fИвент &#00ff00%s&f &7(&fUUID: &#00ff00%s...&7)&f остановлен",
+        ConfiguredMessages.send(
+                sender,
+                "commands.stop.one",
+                "&#FFF78F[EventManager] &fИвент &#00ff00{event}&f &7(&fUUID: &#00ff00{uuid}...&7)&f остановлен",
+                "event",
                 event.getId(),
-                uuid.substring(0, 8)
-        )));
+                "uuid",
+                uuid.substring(0, 8));
     }
 
     private void handleStopByEventIdAndUuid(CommandSender sender, String eventId, String uuid) {
         Event event = eventManager.getEventByUUID(uuid);
         if (event != null && event.getId().equalsIgnoreCase(eventId)) {
             event.updateStopping();
-            sender.sendMessage(Colorize.parse(String.format(
-                    "&#FFF78F[EventManager] &fИвент &#00ff00%s&f &7(&fUUID: &#00ff00%s...&7)&f остановлен",
+            ConfiguredMessages.send(
+                    sender,
+                    "commands.stop.one",
+                    "&#FFF78F[EventManager] &fИвент &#00ff00{event}&f &7(&fUUID: &#00ff00{uuid}...&7)&f остановлен",
+                    "event",
                     eventId,
-                    uuid.substring(0, 8)
-            )));
+                    "uuid",
+                    uuid.substring(0, 8));
         } else {
             handleStopByEventId(sender, eventId);
         }
@@ -89,34 +108,36 @@ public class StopSubCommand implements SubCommand {
         Set<Event> events = eventManager.getActiveEventsById(eventId);
 
         if (events.isEmpty()) {
-            sender.sendMessage(Colorize.parse(String.format(
-                    "&#FFF78F[EventManager] &fНе найдено активных ивентов для &#ff0000%s",
-                    eventId
-            )));
+            ConfiguredMessages.send(
+                    sender,
+                    "commands.stop.event_not_found",
+                    "&#FFF78F[EventManager] &fНе найдено активных ивентов для &#ff0000{event}",
+                    "event",
+                    eventId);
             return;
         }
 
         events.forEach(Event::updateStopping);
-        sender.sendMessage(Colorize.parse(String.format(
-                "&#FFF78F[EventManager] &fОстановлено &#00ff00%d&f ивентов с ID &#00ff00%s",
+        ConfiguredMessages.send(
+                sender,
+                "commands.stop.event_count",
+                "&#FFF78F[EventManager] &fОстановлено &#00ff00{count}&f ивентов с ID &#00ff00{event}",
+                "count",
                 events.size(),
-                eventId
-        )));
+                "event",
+                eventId);
     }
 
     @Override
-    public List<String> onTabCompleter(CommandSender commandSender, String[] args) {
+    public List<String> tabComplete(@NotNull CommandSender commandSender, String[] args) {
         if (args.length == 2) {
             List<String> options = new ArrayList<>();
             options.add("all");
 
-            eventManager.getActiveEvents().stream()
-                    .map(Event::getId)
-                    .distinct()
-                    .forEach(options::add);
+            eventManager.getActiveEvents().stream().map(Event::getId).distinct().forEach(options::add);
 
             eventManager.getActiveEvents().stream()
-                    .map(event -> event.getUuid().toString())
+                    .map(event -> event.getUniqueId().toString())
                     .forEach(options::add);
 
             return options.stream()
@@ -128,7 +149,7 @@ public class StopSubCommand implements SubCommand {
         if (args.length == 3 && !args[1].equalsIgnoreCase("all")) {
             return eventManager.getActiveEvents().stream()
                     .filter(event -> event.getId().equalsIgnoreCase(args[1]))
-                    .map(event -> event.getUuid().toString())
+                    .map(event -> event.getUniqueId().toString())
                     .filter(uuid -> uuid.toLowerCase().startsWith(args[2].toLowerCase()))
                     .sorted()
                     .toList();

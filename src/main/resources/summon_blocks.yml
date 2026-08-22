@@ -1,0 +1,67 @@
+# Общая механика призыва событий.
+# Конкретные summon-item конкретного ивента рекомендуется хранить в его EventConfig
+# в секции `summoners`. SunEventManager автоматически подхватывает ее при регистрации ивента.
+enabled: true
+
+# true — блок является только предметом призыва и физически не ставится.
+cancel_block_place: true
+# Работает при cancel_block_place: true. В creative предмет не списывается.
+consume_item: true
+
+# Общие fallback-сообщения. Конкретный EventConfig может переопределить их
+# в своей секции summoners.messages или у отдельного item в items.<id>.messages.
+messages:
+  success: '&#22FF88▶&f Ивент &#22FF88{event}&f призван. &7Редкость: &f{rarity}'
+  cooldown: '&#FF2222▶&f Подождите &#FF2222{time}&f сек. перед следующим призывом.'
+  blocked_block: '&#FF2222▶&f На этом блоке нельзя призвать ивент.'
+  region: '&#FF2222▶&f Рядом находится защищенный регион.'
+  sky: '&#FF2222▶&f Над точкой призыва должно быть открытое небо.'
+  min_y: '&#FF2222▶&f Слишком низко для призыва ивента.'
+  max_y: '&#FF2222▶&f Слишком высоко для призыва ивента.'
+  unknown_event: '&#FF2222▶&f Ивент &#FF2222{event}&f не найден.'
+  unknown_rarity: '&#FF2222▶&f Редкость &#FF2222{rarity}&f для ивента &#FF2222{event}&f не найдена.'
+  start_error: '&#FF2222▶&f Не удалось призвать ивент &#FF2222{event}&f. &7{error}'
+
+defaults:
+  cooldown_seconds: 0
+  delay_seconds: 0
+  cooldown_group: ''
+  location_mode: PLACED_BLOCK
+  # EXACT — конкретный summon-item; MATERIAL — любой предмет этого Material.
+  match_mode: EXACT
+  location_offset: '0:0:0'
+  bypass_permission: suneventmanager.summon.bypass
+  region_bypass_permission: suneventmanager.summon.region_bypass
+
+  checks:
+    min_y: -64
+    max_y: 320
+    require_clear_sky: false
+    require_empty_region: false
+    region_size: '15:200:15'
+    blocked_blocks: [ ]
+
+  effects:
+    sounds:
+      success:
+        enabled: false
+        sound: BLOCK_NOTE_BLOCK_PLING
+        volume: 1.0
+        pitch: 1.0
+        global: false
+      failed:
+        enabled: false
+        sound: ENTITY_VILLAGER_NO
+        volume: 1.0
+        pitch: 1.0
+        global: false
+      spawn:
+        enabled: false
+        sound: ENTITY_LIGHTNING_BOLT_THUNDER
+        volume: 1.0
+        pitch: 1.0
+        global: true
+    particles: { }
+
+profiles: { }
+items: { }

@@ -1,11 +1,11 @@
 package ru.loper.suneventmanager.utils;
 
-public class TimeUtils {
-    private TimeUtils() {
-        //Утилитный класс
-    }
+import lombok.experimental.UtilityClass;
 
-    public static String formatSeconds(int totalSeconds) {
+@UtilityClass
+public class TimeUtils {
+    public String formatSeconds(int totalSeconds) {
+        totalSeconds = Math.max(0, totalSeconds);
         int years = totalSeconds / (365 * 24 * 3600);
         totalSeconds %= 365 * 24 * 3600;
 
@@ -28,11 +28,8 @@ public class TimeUtils {
         if (days > 0) builder.append(days).append(" д. ");
         if (hours > 0) builder.append(hours).append(" ч. ");
         if (minutes > 0) builder.append(minutes).append(" мин. ");
-        if (seconds > 0 || builder.isEmpty())
-            builder.append(seconds).append(" сек");
+        if (seconds > 0 || builder.isEmpty()) builder.append(seconds).append(" сек");
 
         return builder.toString().trim();
     }
-
-
 }

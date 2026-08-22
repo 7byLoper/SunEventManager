@@ -1,7 +1,28 @@
 name: SunEventManager
-version: '${project.version}'
 main: ru.loper.suneventmanager.SunEventManager
+folia-supported: false
+
+version: '${version}'
 api-version: '1.16'
-depend: [ SunCore, PlaceholderAPI, DecentHolograms ]
+
 authors: [ Loper ]
 website: t.me/bySunDev
+
+depend: [ SunLootManager, SunCore, WorldEdit, WorldGuard ]
+softdepend: [ PlaceholderAPI, FunUtils ]
+
+permissions:
+  suneventmanager.command.event:
+    default: true
+  suneventmanager.command.delay:
+    default: true
+  suneventmanager.command.gps:
+    default: true
+  suneventmanager.command.summon:
+    default: op
+  suneventmanager.command.summon.give:
+    default: op
+  suneventmanager.summon.bypass:
+    default: op
+  suneventmanager.summon.region_bypass:
+    default: op

@@ -2,74 +2,77 @@ package ru.loper.suneventmanager;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.loper.suneventmanager.api.modules.event.EventManager;
-import ru.loper.suneventmanager.api.modules.summoner.Summoner;
+import ru.loper.suneventmanager.api.models.EventChest;
 import ru.loper.suneventmanager.commands.event.EventCommand;
 import ru.loper.suneventmanager.commands.vote.VoteCommand;
+import ru.loper.suneventmanager.config.LootSettingsManager;
 import ru.loper.suneventmanager.config.PluginConfigManager;
 import ru.loper.suneventmanager.listeners.ChestListener;
+import ru.loper.suneventmanager.listeners.InternalListener;
+import ru.loper.suneventmanager.listeners.SummonBlockListener;
 import ru.loper.suneventmanager.listeners.VoteMenuListener;
-
-import java.lang.reflect.Constructor;
+import ru.loper.suneventmanager.manager.EventManager;
+import ru.loper.suneventmanager.manager.SummonBlockManager;
+import ru.loper.suneventmanager.message.MessageService;
+import ru.loper.suneventmanager.summoner.Summoner;
+import ru.loper.suneventmanager.summoner.block.service.SummonBlockService;
 
 @Getter
 public final class SunEventManager extends JavaPlugin {
+
     @Getter
     private static SunEventManager instance;
 
+    private MessageService messageService;
     private PluginConfigManager configManager;
+    private LootSettingsManager lootSettingsManager;
     private Summoner summoner;
     private EventManager eventManager;
-
-    public static boolean isDebug() {
-        return getInstance().configManager.isDebug();
-    }
+    private SummonBlockManager summonBlockManager;
+    private SummonBlockService summonBlockService;
 
     @Override
     public void onEnable() {
         instance = this;
 
+        messageService = new MessageService(this);
         configManager = new PluginConfigManager(this);
-        summoner = new Summoner(configManager, this);
+        lootSettingsManager = configManager.getLootSettingsManager();
         eventManager = new EventManager(this);
+        summoner = new Summoner(configManager, this);
+        summonBlockManager = new SummonBlockManager(this, configManager.getSummonBlocksConfig());
+        summonBlockService = new SummonBlockService(this, eventManager, summonBlockManager);
 
         Bukkit.getPluginManager().registerEvents(new ChestListener(), this);
         Bukkit.getPluginManager().registerEvents(new VoteMenuListener(), this);
+        Bukkit.getPluginManager().registerEvents(new InternalListener(eventManager), this);
+        Bukkit.getPluginManager().registerEvents(new SummonBlockListener(summonBlockManager, summonBlockService), this);
 
         initCommands();
     }
 
     @Override
     public void onDisable() {
+        if (summoner != null && summoner.getVoteManager() != null) {
+            summoner.getVoteManager().clearCurrentVote();
+        }
+
+        if (summonBlockService != null) {
+            summonBlockService.shutdown();
+        }
+
         if (eventManager != null) {
             eventManager.stopAllActiveEvents();
             eventManager.clearAllRegisteredEvents();
         }
+
+        EventChest.removeAllChests();
+        instance = null;
     }
 
     private void initCommands() {
-        registerCommand(configManager.getEventCommand(), new EventCommand(this));
-        registerCommand(configManager.getVoteCommand(), new VoteCommand(this));
+        new EventCommand(this).registerWrappers();
+        new VoteCommand(this).registerWrappers();
     }
-
-    private void registerCommand(String commandName, CommandExecutor executor) {
-        try {
-            CommandMap commandMap = getServer().getCommandMap();
-            Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-            constructor.setAccessible(true);
-
-            PluginCommand command = constructor.newInstance(commandName, this);
-
-            command.setExecutor(executor);
-            commandMap.register(getDescription().getName(), command);
-        } catch (Exception exception) {
-            getLogger().severe("Unable to register command: " + commandName + ". Error: " + exception.getMessage());
-        }
-    }
-
 }

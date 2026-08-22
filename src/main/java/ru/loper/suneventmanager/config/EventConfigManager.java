@@ -1,179 +1,149 @@
 package ru.loper.suneventmanager.config;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.block.Biome;
+import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Vector;
 import ru.loper.suncore.api.config.CustomConfig;
-import ru.loper.suncore.utils.Colorize;
-import ru.loper.suneventmanager.api.modules.event.Event;
-import ru.loper.suneventmanager.api.modules.event.rarity.EventRarityManager;
-import ru.loper.suneventmanager.utils.TimeUtils;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import ru.loper.suneventmanager.api.models.Event;
+import ru.loper.suneventmanager.api.models.settings.EventBossBarSettings;
+import ru.loper.suneventmanager.api.models.settings.GeneratorSettings;
+import ru.loper.suneventmanager.manager.EventRarityManager;
 
 @Getter
 public class EventConfigManager {
     protected final Plugin plugin;
-    protected EventRarityManager rarityManager;
-    protected CustomConfig eventConfig;
-    protected Vector regionRadius;
-    protected Vector generatorCenter;
+    private final double chance;
+    private final String displayName;
+    private final boolean automaticStartEnabled;
+    private final boolean voteEnabled;
+    private final boolean closeChestsOnStopping;
 
-    protected World eventWorld;
-    protected int generatorRadius;
-    protected List<Biome> generatorBiomes;
-    protected String biomesPropertyType;
+    @Setter
+    protected EventRarityManager rarityManager;
+
+    protected CustomConfig eventConfig;
+
+    protected GeneratorSettings generatorSettings;
+    private EventBossBarSettings bossBarSettings;
 
     private int eventStartTime;
     private int eventPrestartTime;
+    private int eventOpenedTime;
     private int eventStopTime;
+    private boolean openedStageEnabled;
 
+    private boolean infoMessagesEnabled;
     private String infoMessagePrestart;
     private String infoMessageStart;
+    private String infoMessageOpen;
     private String infoMessageStop;
-
-    private boolean region = true;
 
     public EventConfigManager(CustomConfig eventConfig, Plugin plugin) {
         this.eventConfig = eventConfig;
         this.plugin = plugin;
-        loadSettings();
-    }
 
-    private void loadSettings() {
+        rarityManager = createRarityManager(eventConfig, plugin);
+        if (rarityManager != null) {
+            rarityManager.loadRarities();
+        }
+
         loadGeneratorSettings();
-        loadRegionSettings();
-        loadRarityManager();
+        loadBossBarSettings();
         loadInfoMessages();
         loadTimers();
+
+        chance = Math.max(0.0D, eventConfig.getConfig().getDouble("chance", 100.0D));
+        displayName = eventConfig
+                .getConfig()
+                .getString("display_name", eventConfig.getConfig().getString("name", ""));
+        automaticStartEnabled = eventConfig
+                .getConfig()
+                .getBoolean("automatic_start", eventConfig.getConfig().getBoolean("auto_start", true));
+        voteEnabled = eventConfig.getConfig().getBoolean("vote_enabled", true);
+        closeChestsOnStopping = eventConfig.getConfig().getBoolean("close_chests_on_stopping", false);
     }
 
-    protected void loadRarityManager() {
-        rarityManager = new EventRarityManager(eventConfig, plugin);
+    protected EventRarityManager createRarityManager(CustomConfig eventConfig, Plugin plugin) {
+        return new EventRarityManager(eventConfig, plugin);
     }
 
     private void loadGeneratorSettings() {
-        ConfigurationSection generatorSettingsSection = eventConfig.getConfig().getConfigurationSection("generator_settings");
-        if (generatorSettingsSection == null) {
+        ConfigurationSection section = eventConfig.getConfig().getConfigurationSection("generator_settings");
+        if (section == null) {
             plugin.getLogger().severe("Ошибка загрузки настроек генератора для ивента");
             return;
         }
+        generatorSettings = GeneratorSettings.fromSection(section);
+    }
 
-        String worldName = generatorSettingsSection.getString("world", "world");
-        eventWorld = Bukkit.getWorld(worldName);
-        if (eventWorld == null) {
-            plugin.getLogger().severe("Мир " + worldName + " не найден! Проверьте конфиг.");
-            eventWorld = Bukkit.getWorld("world");
-        }
-        generatorRadius = generatorSettingsSection.getInt("radius", 2000);
-
-        ConfigurationSection centerSection = generatorSettingsSection.getConfigurationSection("center");
-        if (centerSection != null) {
-            int centerX = centerSection.getInt("x", 0);
-            int centerZ = centerSection.getInt("z", 0);
-            generatorCenter = new Vector(centerX, 0, centerZ);
-        } else {
-            generatorCenter = new Vector(0, 0, 0);
-        }
-
-        List<String> biomeNames = generatorSettingsSection.getStringList("biomes");
-        generatorBiomes = biomeNames.stream()
-                .map(biomeName -> {
-                    try {
-                        return Biome.valueOf(biomeName.toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        plugin.getLogger().warning("Неизвестный биом: " + biomeName);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        biomesPropertyType = generatorSettingsSection.getString("biomes_property_type", "blacklist");
+    private void loadBossBarSettings() {
+        bossBarSettings =
+                EventBossBarSettings.fromSection(eventConfig.getConfig().getConfigurationSection("bossbar"));
     }
 
     private void loadInfoMessages() {
         ConfigurationSection infoSection = eventConfig.getConfig().getConfigurationSection("info_messages");
         if (infoSection == null) {
             plugin.getLogger().warning("Секция info_messages не найдена в конфиге!");
+            infoMessagesEnabled = true;
             infoMessagePrestart = "Пре-стартовое сообщение не задано";
             infoMessageStart = "Сообщение старта не задано";
+            infoMessageOpen = "Сообщение активной стадии не задано";
             infoMessageStop = "Сообщение окончания не задано";
             return;
         }
 
-        infoMessagePrestart = Colorize.parse(infoSection.getString("prestart", "Пре-стартовое сообщение не задано"));
-        infoMessageStart = Colorize.parse(infoSection.getString("start", "Сообщение старта не задано"));
-        infoMessageStop = Colorize.parse(infoSection.getString("stop", "Сообщение окончания не задано"));
-    }
-
-    private void loadRegionSettings() {
-        ConfigurationSection regionSettingsSection = eventConfig.getConfig().getConfigurationSection("region_settings");
-        if (regionSettingsSection == null) {
-            region = false;
-            return;
-        }
-
-        ConfigurationSection radiusSection = regionSettingsSection.getConfigurationSection("region_radius");
-        if (radiusSection == null) {
-            plugin.getLogger().severe("Ошибка загрузки радиуса региона для ивента");
-            return;
-        }
-
-        int regionX = radiusSection.getInt("x", 10);
-        int regionY = radiusSection.getInt("y", 10);
-        int regionZ = radiusSection.getInt("z", 10);
-
-        regionRadius = new Vector(regionX, regionY, regionZ);
+        infoMessagesEnabled = infoSection.getBoolean("enabled", true);
+        infoMessagePrestart = infoSection.getString("prestart", "Пре-стартовое сообщение не задано");
+        infoMessageStart = infoSection.getString("start", "Сообщение старта не задано");
+        infoMessageOpen = infoSection.getString("open", infoSection.getString("active", infoMessageStart));
+        infoMessageStop =
+                infoSection.getString("stop", infoSection.getString("ending", "Сообщение окончания не задано"));
     }
 
     private void loadTimers() {
         ConfigurationSection timersSection = eventConfig.getConfig().getConfigurationSection("timers");
         if (timersSection == null) {
             plugin.getLogger().severe("Ошибка загрузки таймеров для ивента");
+            eventPrestartTime = 60;
+            eventStartTime = 120;
+            eventOpenedTime = 0;
+            eventStopTime = 120;
+            openedStageEnabled = false;
             return;
         }
 
-        eventPrestartTime = timersSection.getInt("prestart", 60);
-        eventStartTime = timersSection.getInt("started", 120);
-        eventStopTime = timersSection.getInt("stopping", 120);
+        eventPrestartTime = Math.max(0, timersSection.getInt("prestart", 60));
+        eventStartTime = Math.max(0, timersSection.getInt("started", 120));
+
+        openedStageEnabled = timersSection.contains("opened") || timersSection.contains("active");
+        if (openedStageEnabled) {
+            eventOpenedTime = Math.max(0, timersSection.getInt("opened", timersSection.getInt("active", 120)));
+            eventStopTime = Math.max(0, timersSection.getInt("stopping", 0));
+            return;
+        }
+
+        // Legacy lifecycle: STARTED -> STOPPING. The old `stopping` timer is the
+        // active/open stage and therefore remains untouched for configs that do
+        // not opt into the extra OPENED stage.
+        eventOpenedTime = 0;
+        eventStopTime = Math.max(0, timersSection.getInt("stopping", 120));
     }
 
     public String getInfoMessageStart(Event event) {
-        return infoMessageStart
-                .replace("{time}", TimeUtils.formatSeconds(event.getEventTimer()))
-                .replace("{x}", String.valueOf(event.getEventLocation().getBlockX()))
-                .replace("{y}", String.valueOf(event.getEventLocation().getBlockY()))
-                .replace("{z}", String.valueOf(event.getEventLocation().getBlockZ()));
+        return infoMessageStart;
+    }
+
+    public String getInfoMessageOpen(Event event) {
+        return infoMessageOpen;
     }
 
     public String getInfoMessageStop(Event event) {
-        return infoMessageStop
-                .replace("{time}", TimeUtils.formatSeconds(event.getEventTimer()))
-                .replace("{x}", String.valueOf(event.getEventLocation().getBlockX()))
-                .replace("{y}", String.valueOf(event.getEventLocation().getBlockY()))
-                .replace("{z}", String.valueOf(event.getEventLocation().getBlockZ()));
+        return infoMessageStop;
     }
 
     public String getInfoMessagePrestart(Event event) {
-        return infoMessagePrestart
-                .replace("{time}", TimeUtils.formatSeconds(event.getEventTimer()))
-                .replace("{x}", String.valueOf(event.getEventLocation().getBlockX()))
-                .replace("{y}", String.valueOf(event.getEventLocation().getBlockY()))
-                .replace("{z}", String.valueOf(event.getEventLocation().getBlockZ()));
-    }
-
-    public boolean isAllowedBiome(Biome biome) {
-        if (biomesPropertyType.equalsIgnoreCase("whitelist")) {
-            return generatorBiomes.contains(biome);
-        }
-
-        return !generatorBiomes.contains(biome);
+        return infoMessagePrestart;
     }
 }

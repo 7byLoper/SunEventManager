@@ -1,30 +1,29 @@
 package ru.loper.suneventmanager.menu.vote;
 
+import java.util.*;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.loper.suncore.api.config.CustomConfig;
-import ru.loper.suncore.api.gui.Button;
-import ru.loper.suncore.api.gui.Menu;
-import ru.loper.suncore.api.items.ItemBuilder;
-import ru.loper.suneventmanager.SunEventManager;
-import ru.loper.suneventmanager.api.modules.event.Event;
-import ru.loper.suneventmanager.api.modules.vote.EventVote;
-import ru.loper.suneventmanager.api.modules.vote.Vote;
+import ru.loper.suncore.api.itemstack.ItemBuilder;
+import ru.loper.suncore.api.menu.button.Button;
+import ru.loper.suncore.api.menu.impl.AbstractMenu;
+import ru.loper.suneventmanager.api.models.Event;
+import ru.loper.suneventmanager.api.models.vote.EventVote;
+import ru.loper.suneventmanager.api.models.vote.Vote;
 import ru.loper.suneventmanager.utils.TimeUtils;
 
-import java.util.*;
-
-public class VoteMenu extends Menu {
+public class VoteMenu extends AbstractMenu {
     @Getter
     private final Set<Player> voteViewers = new HashSet<>();
+
     private final CustomConfig config;
     private final Vote vote;
 
@@ -56,20 +55,15 @@ public class VoteMenu extends Menu {
         ConfigurationSection slotsSection = config.getConfig().getConfigurationSection("slots");
 
         if (eventsSection == null || slotsSection == null) {
-            if (SunEventManager.isDebug()) {
-                Bukkit.getLogger().info("[VoteMenu] Секция 'events' или 'slots' не найдена в конфиге.");
-            }
             return;
         }
 
-        List<Map.Entry<Event, EventVote>> eventList = new ArrayList<>(vote.getEventVotes().entrySet());
+        List<Map.Entry<Event, EventVote>> eventList =
+                new ArrayList<>(vote.getEventVotes().entrySet());
         int eventCount = eventList.size();
 
         List<Integer> slotList = slotsSection.getIntegerList(String.valueOf(eventCount));
         if (slotList.isEmpty()) {
-            if (SunEventManager.isDebug()) {
-                Bukkit.getLogger().info("[VoteMenu] Не найдены слоты для " + eventCount + " ивентов.");
-            }
             return;
         }
 
@@ -81,15 +75,14 @@ public class VoteMenu extends Menu {
 
             ConfigurationSection eventSection = eventsSection.getConfigurationSection(event.getId());
             if (eventSection == null) {
-                if (SunEventManager.isDebug()) {
-                    Bukkit.getLogger().info("[VoteMenu] Не найдена секция для ивента: " + event.getId());
-                }
                 continue;
             }
 
             ItemBuilder builder = ItemBuilder.fromConfig(eventSection);
-            builder.name(builder.name().replace("{votes}", String.valueOf(votes))
+            builder.name(builder.name()
+                    .replace("{votes}", String.valueOf(votes))
                     .replace("{rarity}", event.getEventRarity().getDisplayName()));
+
             builder.lore(builder.lore().stream()
                     .map(line -> line.replace("{votes}", String.valueOf(votes))
                             .replace("{rarity}", event.getEventRarity().getDisplayName()))
@@ -101,22 +94,38 @@ public class VoteMenu extends Menu {
     }
 
     private void addEventButton(ItemBuilder builder, int slot, Event event) {
-        buttons.add(new Button(builder.build(), slot) {
+        menuButtons.add(new Button(builder.build(), slot) {
             @Override
             public void onClick(InventoryClickEvent e) {
-                if (e.getWhoClicked() instanceof Player player) {
-                    if (vote.hasVoted(player, event)) return;
-
-                    vote.addVote(player, event);
+                if (!(e.getWhoClicked() instanceof Player player)) {
+                    return;
                 }
+
+                if (vote.hasVoted(player, event)) {
+                    return;
+                }
+
+                vote.addVote(player, event);
             }
         });
     }
 
     private void addDecor() {
         ConfigurationSection decorSection = config.getConfig().getConfigurationSection("decor");
-        if (decorSection == null) return;
+        if (decorSection == null) {
+            return;
+        }
+
         addDecorFromSection(decorSection);
+    }
+
+    public boolean requiresTimerRefresh() {
+        String title = config.getConfig().getString("title", "");
+        return title.contains("{time}");
+    }
+
+    public void refreshViewers() {
+        new ArrayList<>(voteViewers).stream().filter(Player::isOnline).forEach(this::show);
     }
 
     @Override
@@ -137,5 +146,10 @@ public class VoteMenu extends Menu {
         if (entity instanceof Player player) {
             voteViewers.add(player);
         }
+    }
+
+    @Override
+    public @NotNull Inventory getInventory() {
+        return menuInventory;
     }
 }

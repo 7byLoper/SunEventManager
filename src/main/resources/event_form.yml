@@ -1,0 +1,115 @@
+# Шаблон конфига подключаемого ивента для SunEventManager 1.3.1+.
+chance: 100
+
+timers:
+  prestart: 60
+  started: 300
+  stopping: 300
+
+# {index} доступен при выводе через /event delay.
+# Также доступны {event}, {rarity}, {time}, {x}, {y}, {z}.
+info_messages:
+  prestart: '&#00D8FF▶&f #{index} {event} &7({rarity}) &fпоявится через {time} на случайных координатах.'
+  start: '&#00D8FF▶&f #{index} {event} &7({rarity}) &fнаходится на {x} {y} {z} и откроется через {time}.'
+  stop: '&#00D8FF▶&f #{index} {event} &7({rarity}) &fнаходится на {x} {y} {z} и удалится через {time}.'
+
+generator_settings:
+  type: RANDOM # RANDOM / STATIC
+  static_location: 'world:0:90:0'
+  radius: 2000
+  max_attempts: 128
+  world: world
+  center: '0:90:0'
+
+  # Сдвигает БАЗОВУЮ точку всего ивента после поиска поверхности.
+  # В отличие от schematic_offset влияет также на регион, сундуки,
+  # голограммы и механику подключаемого ивента.
+  location_offset: '0:0:0'
+
+  # Дополнительные production-проверки точки. По умолчанию они выключены,
+  # поэтому старые конфиги остаются обратно совместимыми.
+  min_y: -64
+  max_y: 320
+  banned_blocks: [ ]
+  require_empty_region: false
+
+  check_floor:
+    enabled: false
+    radius: 4
+    step: 2
+
+  check_air:
+    enabled: false
+    radius: 5
+    height: 4
+    step: 2
+
+  biomes_property_type: whitelist
+  biomes: [ PLAINS, SUNFLOWER_PLAINS, SNOWY_PLAINS, ICE_SPIKES, DESERT, SAVANNA, SAVANNA_PLATEAU, BADLANDS, WOODED_BADLANDS, ERODED_BADLANDS, SNOWY_BEACH, BEACH, STONY_SHORE, MUSHROOM_FIELDS, FROZEN_RIVER, THE_VOID ]
+
+rarities:
+  default:
+    display_name: "Обычный"
+    chance: 40
+
+    # Можно оставить пустым для ивента без постройки:
+    # schematic_file_name: ''
+    schematic_file_name: default.schem
+
+    # Сдвигает только вставляемую схематику относительно eventLocation.
+    schematic_offset: '0:0:0'
+    loot_name: default
+
+    region_settings:
+      enable: true
+      size: '30:200:30'
+      flags:
+        pvp: deny
+        tnt: deny
+        fall-damage: deny
+        trap-flag: deny
+        creeper-explosion: deny
+        other-explosion: deny
+        lava-fire: deny
+        water-flow: deny
+        lava-flow: deny
+        ice-melt: deny
+
+    hologram_toggle: true
+    hologram_offset: '0.5:2.0:0.5'
+    holograms:
+      start:
+        - 'Ивент'
+        - 'Откроется через {time}'
+      stop:
+        - 'Ивент'
+        - 'Закроется через {time}'
+
+    messages:
+      prestart: [ ]
+      start: [ ]
+      stop: [ ]
+
+    sounds:
+      prestart: 'ENTITY_PLAYER_LEVELUP;1.0;1.0'
+      start: 'ENTITY_PLAYER_LEVELUP;1.0;1.0'
+
+    chests:
+      title: 'Обычный груз'
+      material: SHULKER_BOX
+      rows: 6
+      items:
+        min: 30
+        max: 40
+
+      # Плавное заполнение. Без блока fill используется прежнее поведение.
+      fill:
+        delay_ticks: 0
+        period_ticks: 1
+        items_per_period: 64
+
+      offsets:
+        - '3:-2:3'
+        - '-3:-2:3'
+        - '3:-2:-3'
+        - '-3:-2:-3'

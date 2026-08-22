@@ -1,0 +1,175 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "net.kyori",
+    "module": "adventure-api",
+    "version": "4.14.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.1.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "net.kyori",
+          "module": "adventure-bom",
+          "version": {
+            "requires": "4.14.0"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        },
+        {
+          "group": "net.kyori",
+          "module": "adventure-key",
+          "version": {
+            "requires": "4.14.0"
+          }
+        },
+        {
+          "group": "net.kyori",
+          "module": "examination-api",
+          "version": {
+            "requires": "1.3.0"
+          }
+        },
+        {
+          "group": "net.kyori",
+          "module": "examination-string",
+          "version": {
+            "requires": "1.3.0"
+          }
+        },
+        {
+          "group": "org.jetbrains",
+          "module": "annotations",
+          "version": {
+            "requires": "24.0.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "adventure-api-4.14.0.jar",
+          "url": "adventure-api-4.14.0.jar",
+          "size": 346214,
+          "sha512": "0ccc98cdc62670e0c1795f6c5147217d2243585c4dd612978709ec43f619d4dea00f09469df6e39ad4ea2f9178022991fc011902d4e5d16a8af5e4e737187a00",
+          "sha256": "1d4cc85babc49917469362fdb4bcd28efbc81c86e52bf473d167ee97c0ec5c76",
+          "sha1": "e8f089092c77caaa0b0fce9ee7c309200437f9e1",
+          "md5": "b9dc2b76149d23df955188ad42557ab9"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "net.kyori",
+          "module": "adventure-bom",
+          "version": {
+            "requires": "4.14.0"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        },
+        {
+          "group": "net.kyori",
+          "module": "adventure-key",
+          "version": {
+            "requires": "4.14.0"
+          }
+        },
+        {
+          "group": "net.kyori",
+          "module": "examination-api",
+          "version": {
+            "requires": "1.3.0"
+          }
+        },
+        {
+          "group": "net.kyori",
+          "module": "examination-string",
+          "version": {
+            "requires": "1.3.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "adventure-api-4.14.0.jar",
+          "url": "adventure-api-4.14.0.jar",
+          "size": 346214,
+          "sha512": "0ccc98cdc62670e0c1795f6c5147217d2243585c4dd612978709ec43f619d4dea00f09469df6e39ad4ea2f9178022991fc011902d4e5d16a8af5e4e737187a00",
+          "sha256": "1d4cc85babc49917469362fdb4bcd28efbc81c86e52bf473d167ee97c0ec5c76",
+          "sha1": "e8f089092c77caaa0b0fce9ee7c309200437f9e1",
+          "md5": "b9dc2b76149d23df955188ad42557ab9"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "adventure-api-4.14.0-javadoc.jar",
+          "url": "adventure-api-4.14.0-javadoc.jar",
+          "size": 956738,
+          "sha512": "7eb54361df668cc60c053baa4ebc16607f5ca3b21a48d4516c15caaf63b23fbeb81503fd37ff373cf8deab631b5c433c7edfa0906f1b1e98ee3f4486201a136a",
+          "sha256": "f2e83a1e0e707344142445fad28ddd91c6522a9c4c2d83da9c0972074d5a930a",
+          "sha1": "01230429cb32688aa9c5302cb1eb34cd0841d9b3",
+          "md5": "9d518afe729cf15d9dba5e4aaf67d78a"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "adventure-api-4.14.0-sources.jar",
+          "url": "adventure-api-4.14.0-sources.jar",
+          "size": 277002,
+          "sha512": "aae3d598a97f4403fe6148825acace2879406c73d54f07d183ae88986e18080bd758afbe87d88e39307781c3dd7b171303f9f18fe2bc124c69911da9ac978c85",
+          "sha256": "d1b1db472dfdf5423d81ba23e9ee70b6d71b2e68029ef20c8afe6e01da6358d9",
+          "sha1": "ae0647722ec6c0b48bc25e78516609c4d7111841",
+          "md5": "7ffddb08a0adeb2cef11410cf25fc1c3"
+        }
+      ]
+    }
+  ]
+}

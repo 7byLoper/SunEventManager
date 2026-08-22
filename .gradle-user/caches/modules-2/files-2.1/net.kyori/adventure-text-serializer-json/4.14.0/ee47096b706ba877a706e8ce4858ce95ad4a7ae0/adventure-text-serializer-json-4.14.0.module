@@ -1,0 +1,140 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "net.kyori",
+    "module": "adventure-text-serializer-json",
+    "version": "4.14.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.1.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "net.kyori",
+          "module": "adventure-bom",
+          "version": {
+            "requires": "4.14.0"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        },
+        {
+          "group": "net.kyori",
+          "module": "adventure-api",
+          "version": {
+            "requires": "4.14.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "adventure-text-serializer-json-4.14.0.jar",
+          "url": "adventure-text-serializer-json-4.14.0.jar",
+          "size": 9261,
+          "sha512": "52c7b770c8feced55184a496ece6030bcd35a52bedec31ad381969265b3e7885c5cd723591ffb86020e00123681ee877dc45ebe2f5e72d1538507e72c9dd9bf8",
+          "sha256": "62d15c970c8f336890f11f0f7492c7c01016bcd2b186356435c155cbdf609ccb",
+          "sha1": "5b4913594c499d4dbf8aed17bca6d65fbca39e41",
+          "md5": "3e3fcc9a4aafe49315f26f9c4f3bfe1d"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "net.kyori",
+          "module": "adventure-bom",
+          "version": {
+            "requires": "4.14.0"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        },
+        {
+          "group": "net.kyori",
+          "module": "adventure-api",
+          "version": {
+            "requires": "4.14.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "adventure-text-serializer-json-4.14.0.jar",
+          "url": "adventure-text-serializer-json-4.14.0.jar",
+          "size": 9261,
+          "sha512": "52c7b770c8feced55184a496ece6030bcd35a52bedec31ad381969265b3e7885c5cd723591ffb86020e00123681ee877dc45ebe2f5e72d1538507e72c9dd9bf8",
+          "sha256": "62d15c970c8f336890f11f0f7492c7c01016bcd2b186356435c155cbdf609ccb",
+          "sha1": "5b4913594c499d4dbf8aed17bca6d65fbca39e41",
+          "md5": "3e3fcc9a4aafe49315f26f9c4f3bfe1d"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "adventure-text-serializer-json-4.14.0-javadoc.jar",
+          "url": "adventure-text-serializer-json-4.14.0-javadoc.jar",
+          "size": 299484,
+          "sha512": "380a99559feef4997cc3e216465e6bdf041c6e78f43688dc2cff83e455990c1f4c1304b333e82174bee7a83f709af20899e3d3bd0afc7793ccb9d8418ba40e71",
+          "sha256": "28bbaba1fea50a0893f8fba3f56e6cb68207cdd3ae2e362bd3b2a0f89a4847d7",
+          "sha1": "c18726dc071c54db7d92a5d047ec17da669a71ec",
+          "md5": "1dc9e86c02f4d1286936f824edfcd668"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "adventure-text-serializer-json-4.14.0-sources.jar",
+          "url": "adventure-text-serializer-json-4.14.0-sources.jar",
+          "size": 8762,
+          "sha512": "4d60cf92679952531c8a28da543e5f6284df861d9eb02e721e6e1e54422d004e98ecfe92cadec4dfa090d6a340f4c4bb3290b7b6ed6a25d0b219cf13b08109f0",
+          "sha256": "92db2320a9a6a69f46853ba50d620d24f017ed147fe9c2c11a04dfc43a0bdd1c",
+          "sha1": "c858407e57cda129ea82f7bd1a7025b7533489c8",
+          "md5": "ce439e6e7b744cfa75db6d7f128534ba"
+        }
+      ]
+    }
+  ]
+}

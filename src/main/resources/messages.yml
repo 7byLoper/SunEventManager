@@ -4,8 +4,28 @@ error_find_location:
   - 'Ошибка поиска локации'
   - 'Локация не была найдена, ивент отменяется'
 
+# Старый формат оставлен для API/совместимости.
 event_time_message:
   - '&#00D8FF▶&f Ближайшее голосование за мероприятие будет проводиться через&#00D8FF {time}'
+
+event_help_message:
+  - '%theme_color-1%[✦]<reset>%theme_color-2% Ивенты<reset>'
+  - '%theme_color-1%/event delay <reset>%theme_color-3%— время и активные ивенты<reset>'
+  - '%theme_color-1%/event gps <reset>%theme_color-3%— установить GPS на активный ивент<reset>'
+  - '%theme_color-1%/event vote <reset>%theme_color-3%— открыть голосование<reset>'
+
+event_delay:
+  vote_active: '%theme_color-1%[✦]<reset>%theme_color-2% Ивенты <reset>%theme_color-3%› Текущее голосование завершится через <reset>%theme_color-1%{time}<reset>%theme_color-3%.<reset>'
+  next_event: '%theme_color-1%[✦]<reset>%theme_color-2% Ивенты <reset>%theme_color-3%› Следующий автоматический ивент через <reset>%theme_color-1%{time}<reset>%theme_color-3%.<reset>'
+  next_vote: '%theme_color-1%[✦]<reset>%theme_color-2% Ивенты <reset>%theme_color-3%› Следующее голосование через <reset>%theme_color-1%{time}<reset>%theme_color-3%.<reset>'
+  nothing: '%theme_color-1%[✘]<reset>%theme_color-2% Ивенты <reset>%theme_color-3%› Активных и запланированных ивентов нет.<reset>'
+
+commands:
+  gps:
+    only_player: '%theme_color-1%[✘]<reset>%theme_color-2% Ивенты <reset>%theme_color-3%› Команда доступна только игроку.<reset>'
+    funutils_unavailable: '%theme_color-1%[✘]<reset>%theme_color-2% Ивенты <reset>%theme_color-3%› GPS временно недоступен.<reset>'
+    no_active_event: '%theme_color-1%[✘]<reset>%theme_color-2% Ивенты <reset>%theme_color-3%› Сейчас нет активного события с известными координатами.<reset>'
+    event_not_found: '%theme_color-1%[✘]<reset>%theme_color-2% Ивенты <reset>%theme_color-3%› Активное событие <reset>%theme_color-1%{event}<reset>%theme_color-3% не найдено.<reset>'
 
 vote_start_message:
   - ''

@@ -1,24 +1,22 @@
 package ru.loper.suneventmanager.menu.setiings;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.Nullable;
 import ru.loper.suncore.api.config.CustomConfig;
-import ru.loper.suncore.api.gui.Button;
-import ru.loper.suncore.api.gui.Menu;
-import ru.loper.suncore.api.items.ItemBuilder;
+import ru.loper.suncore.api.itemstack.ItemBuilder;
+import ru.loper.suncore.api.menu.button.Button;
+import ru.loper.suncore.api.menu.impl.AbstractMenu;
 import ru.loper.suneventmanager.SunEventManager;
-import ru.loper.suneventmanager.api.modules.event.Event;
-import ru.loper.suneventmanager.api.modules.event.EventManager;
 import ru.loper.suneventmanager.config.EventConfigManager;
 import ru.loper.suneventmanager.config.PluginConfigManager;
+import ru.loper.suneventmanager.manager.EventManager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-public class EventsMenu extends Menu {
+public class EventsMenu extends AbstractMenu {
     private final PluginConfigManager configManager;
     private final CustomConfig config;
     private final EventManager eventManager;
@@ -56,14 +54,20 @@ public class EventsMenu extends Menu {
     }
 
     private void addEvents() {
-        List<Map.Entry<String, Class<? extends Event>>> eventEntries = new ArrayList<>(eventManager.getAllRegisteredEvents().entrySet());
+        if (slots.isEmpty()) {
+            return;
+        }
+
+        List<Map.Entry<String, EventManager.WrappedEvent>> eventEntries =
+                new ArrayList<>(eventManager.getAllRegisteredEvents().entrySet());
+        eventEntries.sort(Map.Entry.comparingByKey());
         int start = page * slots.size();
 
         ConfigurationSection formSection = config.getConfig().getConfigurationSection("event_form");
         if (formSection == null) return;
 
         for (int i = 0; i < slots.size() && start + i < eventEntries.size(); i++) {
-            Map.Entry<String, Class<? extends Event>> entry = eventEntries.get(start + i);
+            Map.Entry<String, EventManager.WrappedEvent> entry = eventEntries.get(start + i);
             String id = entry.getKey();
             int runs = eventManager.getActiveEventsById(id).size();
 
@@ -74,11 +78,11 @@ public class EventsMenu extends Menu {
                             .toList());
 
             int slot = slots.get(i);
-            buttons.add(new Button(item.build(), slot) {
+            menuButtons.add(new Button(item.build(), slot) {
                 @Override
                 public void onClick(InventoryClickEvent e) {
                     if (e.getWhoClicked() instanceof Player player) {
-                        EventConfigManager eventConfigManager = SunEventManager.getInstance().getEventManager().getEventConfigById(id);
+                        EventConfigManager eventConfigManager = entry.getValue().configManager();
                         new EventSettingsMenu(id, configManager, eventConfigManager, getInstance()).show(player);
                     }
                 }
@@ -87,36 +91,42 @@ public class EventsMenu extends Menu {
     }
 
     private void addNavigationButtons() {
+        if (slots.isEmpty()) {
+            return;
+        }
+
         int total = eventManager.getAllRegisteredEvents().size();
         int maxPages = (int) Math.ceil((double) total / slots.size());
 
         ConfigurationSection itemsSection = config.getConfig().getConfigurationSection("items");
         if (itemsSection == null) return;
 
-        ConfigurationSection nextPageSection = itemsSection.getConfigurationSection("newt_page");
+        ConfigurationSection nextPageSection = itemsSection.getConfigurationSection("next_page");
         if (nextPageSection != null && page + 1 < maxPages) {
-            buttons.add(new Button(ItemBuilder.fromConfig(nextPageSection).build(), nextPageSection.getInt("slot")) {
-                @Override
-                public void onClick(InventoryClickEvent e) {
-                    if (e.getWhoClicked() instanceof Player player) {
-                        page++;
-                        show(player);
-                    }
-                }
-            });
+            menuButtons.add(
+                    new Button(ItemBuilder.fromConfig(nextPageSection).build(), nextPageSection.getInt("slot")) {
+                        @Override
+                        public void onClick(InventoryClickEvent e) {
+                            if (e.getWhoClicked() instanceof Player player) {
+                                page++;
+                                show(player);
+                            }
+                        }
+                    });
         }
 
         ConfigurationSection backPageSection = itemsSection.getConfigurationSection("back_page");
         if (backPageSection != null && page > 0) {
-            buttons.add(new Button(ItemBuilder.fromConfig(backPageSection).build(), backPageSection.getInt("slot")) {
-                @Override
-                public void onClick(InventoryClickEvent e) {
-                    if (e.getWhoClicked() instanceof Player player) {
-                        page--;
-                        show(player);
-                    }
-                }
-            });
+            menuButtons.add(
+                    new Button(ItemBuilder.fromConfig(backPageSection).build(), backPageSection.getInt("slot")) {
+                        @Override
+                        public void onClick(InventoryClickEvent e) {
+                            if (e.getWhoClicked() instanceof Player player) {
+                                page--;
+                                show(player);
+                            }
+                        }
+                    });
         }
     }
 }
