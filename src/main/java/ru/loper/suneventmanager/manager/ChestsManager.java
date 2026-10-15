@@ -18,7 +18,7 @@ import ru.loper.sunlootmanager.api.modules.Loot;
 
 @Getter
 public class ChestsManager {
-    private final EventRarity eventRarity;
+    protected final EventRarity eventRarity;
     private final Map<Event, Set<EventChest>> eventChests = new HashMap<>();
     private final Set<Vector> chestOffsets = new LinkedHashSet<>();
 
