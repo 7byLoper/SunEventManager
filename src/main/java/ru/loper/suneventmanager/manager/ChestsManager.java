@@ -19,20 +19,20 @@ import ru.loper.sunlootmanager.api.modules.Loot;
 @Getter
 public class ChestsManager {
     protected final EventRarity eventRarity;
-    private final Map<Event, Set<EventChest>> eventChests = new HashMap<>();
-    private final Set<Vector> chestOffsets = new LinkedHashSet<>();
+    protected final Map<Event, Set<EventChest>> eventChests = new HashMap<>();
+    protected final Set<Vector> chestOffsets = new LinkedHashSet<>();
 
-    private String chestTitle = "Сундук с ресурсами";
-    private Material chestMaterial = Material.BLUE_SHULKER_BOX;
-    private int chestSize = 27;
-    private int minItems = 1;
-    private int maxItems = chestSize;
-    private long fillDelayTicks = 1L;
-    private long fillPeriodTicks = 1L;
-    private int fillItemsPerPeriod = 1;
-    private Material schematicMaterial;
-    private boolean restoreOriginalBlock;
-    private boolean saveContainerContents;
+    protected String chestTitle = "Сундук с ресурсами";
+    protected Material chestMaterial = Material.BLUE_SHULKER_BOX;
+    protected int chestSize = 27;
+    protected int minItems = 1;
+    protected int maxItems = chestSize;
+    protected long fillDelayTicks = 1L;
+    protected long fillPeriodTicks = 1L;
+    protected int fillItemsPerPeriod = 1;
+    protected Material schematicMaterial;
+    protected boolean restoreOriginalBlock;
+    protected boolean saveContainerContents;
 
     public ChestsManager(EventRarity eventRarity) {
         this.eventRarity = eventRarity;
