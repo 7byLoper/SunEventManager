@@ -73,7 +73,7 @@ public class ChestsManager {
         return material != null && material.isBlock() ? material : null;
     }
 
-    private Material getMaterialOrDefault(String name) {
+    protected Material getMaterialOrDefault(String name) {
         Material material = name == null ? null : Material.matchMaterial(name);
         if (!isContainerMaterial(material)) {
             SunEventManager.getInstance()
