@@ -28,7 +28,13 @@ public class WGHook {
             return false;
         }
 
-        RegionManager regions = getRegionManager(location.getWorld());
+        RegionManager regions;
+        try {
+            regions = getRegionManager(location.getWorld());
+        } catch (LinkageError error) {
+            logUnavailable(error);
+            return false;
+        }
         if (regions == null) {
             return false;
         }
@@ -46,12 +52,16 @@ public class WGHook {
             return flagsMap;
         }
 
-        for (String key : flagsSection.getKeys(false)) {
-            Flag<?> wgFlag = WorldGuard.getInstance().getFlagRegistry().get(key);
-            String value = flagsSection.getString(key);
-            if (wgFlag != null && value != null) {
-                flagsMap.put(wgFlag, value);
+        try {
+            for (String key : flagsSection.getKeys(false)) {
+                Flag<?> wgFlag = WorldGuard.getInstance().getFlagRegistry().get(key);
+                String value = flagsSection.getString(key);
+                if (wgFlag != null && value != null) {
+                    flagsMap.put(wgFlag, value);
+                }
             }
+        } catch (LinkageError error) {
+            logUnavailable(error);
         }
         return flagsMap;
     }
@@ -78,6 +88,8 @@ public class WGHook {
             SunEventManager.getInstance()
                     .getLogger()
                     .log(java.util.logging.Level.SEVERE, "Ошибка создания WorldGuard-региона: " + name, e);
+        } catch (LinkageError error) {
+            logUnavailable(error);
         }
     }
 
@@ -135,9 +147,19 @@ public class WGHook {
             return;
         }
 
-        RegionManager regions = getRegionManager(world);
-        if (regions != null) {
-            regions.removeRegion(name, RemovalStrategy.REMOVE_CHILDREN);
+        try {
+            RegionManager regions = getRegionManager(world);
+            if (regions != null) {
+                regions.removeRegion(name, RemovalStrategy.REMOVE_CHILDREN);
+            }
+        } catch (LinkageError error) {
+            logUnavailable(error);
         }
+    }
+
+    private void logUnavailable(LinkageError error) {
+        SunEventManager.getInstance()
+                .getLogger()
+                .warning("WorldGuard недоступен, региональная защита события отключена: " + error.getMessage());
     }
 }
